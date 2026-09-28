@@ -3,175 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redacted — Visual Direction Explorations (Round 3)</title>
+<title>Redacted</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   REDACTED — the game (folio look, kept as simple as possible)
+   Quotes live in quotes.js; this file is the whole game.
+   ============================================================ */
 :root{
-  --bg:#1c1a15; --card:#262319; --line:#3a362c; --fg:#f2ece0; --dim:#a89f8c; --accent:#c9a86a;
-  --serif:'Newsreader',Georgia,serif; --sans:'Archivo',system-ui,sans-serif;
+  --paper:#f6f2e8; --page:#fbf8f1; --ink:#211d15; --muted:#6b6353;
+  --rule:#ddd5c2; --redact:#17130c; --correct:#3a5741; --miss:#8f3a2a;
+  --serif:'EB Garamond', Georgia, serif;
+  --t-sm:.85rem; --t-md:1.1rem; --t-lg:1.4rem; --t-xl:1.75rem; --t-2xl:2.6rem;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--sans);background:var(--bg);color:var(--fg);line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased;}
-.wrap{max-width:1040px;margin:0 auto;padding:4rem 1.5rem 5rem;}
-header{max-width:64ch;margin-bottom:1.5rem;}
-.kick{font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.4rem,6vw,3.9rem);line-height:1;margin:.6rem 0;letter-spacing:.01em;}
-h1 .bar{background:var(--fg);color:transparent;border-radius:3px;padding:0 .1em;}
-header p{color:var(--dim);font-size:1.08rem;max-width:58ch;margin-top:.5rem;}
-header p em{color:var(--fg);font-style:normal;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.25rem;}
-a.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
-  border-radius:14px;overflow:hidden;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative;}
-a.card.lead{border-color:var(--accent);}
-a.card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 18px 40px -24px rgba(0,0,0,.8);}
-.swatch{height:140px;display:grid;place-items:center;position:relative;overflow:hidden;padding:1rem;}
-.bar{height:15px;border-radius:2px;}
-.body{padding:1.1rem 1.25rem 1.4rem;}
-.num{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
-.name{font-family:var(--serif);font-weight:500;font-size:1.34rem;margin:.2rem 0 .35rem;}
-.desc{color:var(--dim);font-size:.9rem;}
-.tag{display:inline-block;margin-top:.7rem;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);}
-.crown{position:absolute;top:.7rem;right:.8rem;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  background:var(--accent);color:#221d12;padding:.28em .6em;border-radius:100px;z-index:2;}
-/* swatches */
-.sw-lit{background:radial-gradient(120% 100% at 50% 0,#faf6ec,#efe8d8);}
-.sw-lit .orn{color:#6a6353;font-family:var(--serif);font-size:1.3rem;letter-spacing:.4em;margin-bottom:.6rem;}
-.sw-lit .bar{width:64%;background:#1c1912;}
-.sw-ed{background:#fff;}
-.sw-ed .bar{width:64%;background:#111;box-shadow:0 0 0 3px #f2b705;}
-.sw-do{background:linear-gradient(180deg,#f4f3ef,#ecebe4);}
-.sw-do .bar{width:64%;background:#111114;box-shadow:0 0 0 2px #f4f3ef,0 0 0 3px #a82f22;}
-.note{margin:2.6rem 0 1rem;border-top:1px solid var(--line);padding-top:1.3rem;color:var(--dim);font-size:.92rem;max-width:74ch;}
-.note b{color:var(--fg);font-weight:600;}
-footer{margin-top:2rem;color:var(--dim);font-size:.85rem;max-width:74ch;}
-footer a{color:var(--accent);}
+*{box-sizing:border-box; margin:0; padding:0;}
+button,input{font-family:inherit; touch-action:manipulation;}
+body{font-family:var(--serif); color:var(--ink); background:var(--paper); line-height:1.65;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;}
+.page{max-width:600px; margin:2.5rem auto; background:var(--page); border:1px solid var(--rule);
+  padding:3.5rem clamp(1.5rem,7vw,4rem); box-shadow:0 18px 40px -32px rgba(40,32,16,.45);}
+.screen{display:none;}
+.screen.active{display:block;}
+.head{text-align:center; font-variant:small-caps; letter-spacing:.35em; font-size:var(--t-sm); color:var(--muted);}
+.folio{text-align:center; font-size:var(--t-md); color:var(--muted); margin-top:.4rem;}
+.asterism{text-align:center; color:var(--muted); margin:1.6rem 0; letter-spacing:.5em;}
+.small{text-align:center; font-variant:small-caps; letter-spacing:.22em; font-size:var(--t-sm); color:var(--muted); margin-top:1.6rem;}
+.btn{display:inline-block; font-family:var(--serif); font-size:var(--t-md); background:var(--ink); color:var(--page);
+  border:1px solid var(--ink); border-radius:2px; padding:.55em 1.6em; cursor:pointer; white-space:nowrap;}
+.btn:hover{opacity:.9;}
+.btn.quiet{background:transparent; color:var(--muted); border:none; font-style:italic; font-size:var(--t-sm); text-decoration:underline;}
+
+/* ---------- title ---------- */
+h1{text-align:center; font-weight:500; font-size:var(--t-2xl); letter-spacing:.14em; margin-top:1.2rem;}
+h1 .tbar{background:var(--redact); color:transparent; padding:0 .08em;}
+.standfirst{text-align:center; font-style:italic; font-size:var(--t-lg); color:var(--muted); max-width:34ch; margin:1.2rem auto 0;}
+.center{text-align:center; margin-top:2rem;}
+
+/* ---------- quote & redaction bars ---------- */
+blockquote{font-size:var(--t-xl); line-height:1.6; margin-top:1.8rem;}
+.term{position:relative; display:inline; white-space:nowrap;}
+.term .bar{position:absolute; inset:-1px -2px; background:var(--redact); border-radius:1px;}
+.play.revealed .term .bar{animation:dissolve 1s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes dissolve{to{opacity:0; filter:blur(3px); transform:scale(1.05);}}
+.play.revealed .term.subject .word{border-bottom:1.5px solid var(--correct); font-weight:500;}
+@media (prefers-reduced-motion:reduce){.play.revealed .term .bar{animation:none; opacity:0;}}
+
+/* ---------- guess row (fixed-height, browser-stable) ---------- */
+.question{text-align:center; font-style:italic; font-size:var(--t-lg); margin:2rem 0 .8rem;}
+.row{display:flex; align-items:center; gap:1.2rem;}
+.gline{flex:1; min-width:0; display:flex; align-items:center; gap:.45rem; height:2.5rem; border-bottom:1.5px solid var(--ink);}
+.gline:focus-within{border-bottom-width:2px;}
+.gline input{flex:1; min-width:0; height:100%; font-size:var(--t-lg); font-style:italic; color:var(--ink);
+  background:transparent; border:none; outline:none; padding:0 .05em;}
+.gline input::placeholder{color:var(--muted); opacity:.6;}
+.gmark{flex:none; width:1.5rem; height:1.5rem; border-radius:100px; display:grid; place-items:center;
+  border:1.5px solid; font-size:.95rem; line-height:1; font-style:normal; visibility:hidden;}
+.gmark.miss{color:var(--miss); border-color:var(--miss);}
+.gmark.ok{color:var(--correct); border-color:var(--correct);}
+.play.revealed .gmark{visibility:visible;}
+.play.revealed .reveal-btn{visibility:hidden;}  /* keeps its footprint: nothing shifts */
+.play.revealed .gline input{pointer-events:none;}
+.play.revealed.wrong .gline input{color:var(--muted); text-decoration:line-through;
+  text-decoration-color:var(--miss); text-decoration-thickness:1.5px;}
+
+/* ---------- in-place reveal panel ---------- */
+.panel{max-height:0; opacity:0; overflow:hidden; transition:max-height .5s ease .75s, opacity .5s ease .75s;}
+.play.revealed .panel{max-height:340px; opacity:1;}
+.answer{font-size:var(--t-lg); margin-top:1.1rem;}
+.answer .truth{font-weight:500; border-bottom:1.5px solid var(--correct);}
+.answer .ok-word{color:var(--correct);}
+.answer .src{font-style:italic; color:var(--muted);}
+.note{font-style:italic; color:var(--muted); font-size:var(--t-md); border-top:1px solid var(--rule);
+  margin-top:1rem; padding-top:.9rem;}
+.panel .center{margin-top:1.4rem;}
+
+/* ---------- the reckoning ---------- */
+.cap{text-align:center; font-variant:small-caps; letter-spacing:.28em; font-size:var(--t-sm); margin-top:1.6rem;}
+.cap.missy{color:var(--miss);}
+.cap.flawless{color:var(--correct);}
+.bigline{text-align:center; font-size:var(--t-xl); line-height:1.5; max-width:28ch; margin:.7rem auto 0;}
+.bigline .t{border-bottom:1.5px solid var(--correct);}
+.bigline .g{font-style:italic; color:var(--miss);}
+.score{text-align:center; font-size:var(--t-md); color:var(--muted); font-style:italic; margin-top:1rem;}
+.dots{display:flex; justify-content:center; gap:.45rem; margin-top:1rem; flex-wrap:wrap;}
+.dots span{width:1.4rem; height:1.4rem; border:1px solid var(--rule); border-radius:100px;
+  display:grid; place-items:center; font-size:.75rem; color:var(--muted); font-style:normal;}
+.dots .h{color:var(--correct); border-color:var(--correct);}
+.dots .n{color:var(--miss); border-color:var(--miss);}
+
+@media (max-width:520px){
+  :root{--t-2xl:2rem; --t-xl:1.4rem; --t-lg:1.2rem;}
+  .page{margin:1rem auto; padding:2rem 1.25rem;}
+  .row{gap:.8rem;}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <p class="kick">Look-and-feel exploration · round 3</p>
-    <h1>RE<span class="bar">DACT</span>ED</h1>
-    <p>Guess the innovation behind an old fear. The redaction hides the innovation
-      <em>and its telltale details</em> — author, date, place — so the era is never given away until
-      the reveal. Three looks; the flow is settled on <em>reveal one-by-one</em>.</p>
-  </header>
 
-  <div class="grid">
-    <a class="card lead" href="game.html">
-      <span class="crown">Playable</span>
-      <div class="swatch" style="background:#fbf8f1;display:grid;place-items:center;">
-        <span class="bar" style="width:60%;background:#17130c;"></span>
+<!-- ============ TITLE ============ -->
+<section class="page screen active" id="scr-title">
+  <h1>RE<span class="tbar" aria-hidden="true">DACT</span>ED</h1>
+  <p class="asterism" aria-hidden="true">⁂</p>
+  <p class="standfirst">Innovation has always been disruptive, whether it's the wheel or artificial
+    intelligence. Read a real reaction, and guess the innovation that sparked it.</p>
+  <div class="center"><button class="btn" onclick="begin()">Begin</button></div>
+</section>
+
+<!-- ============ PLAY ============ -->
+<section class="page screen play" id="scr-play">
+  <p class="head">Redacted</p>
+  <p class="folio" id="folio"></p>
+
+  <blockquote id="quote"></blockquote>
+
+  <p class="question" id="ask">What's the innovation?</p>
+  <form id="form">
+    <div class="row">
+      <div class="gline">
+        <input id="g" type="text" autocomplete="off" autocapitalize="off"
+               placeholder="an innovation…" aria-labelledby="ask">
+        <span class="gmark" id="gmark" role="img"></span>
       </div>
-      <div class="body">
-        <p class="num">The Game</p>
-        <p class="name">Redacted</p>
-        <p class="desc">The playable build — folio look, one-by-one in-place dissolve reveals, miss-first reckoning, copy-to-share. Quotes are placeholders in <code>quotes.js</code>, ready to swap for real ones.</p>
-        <span class="tag">Play it</span>
-      </div>
-    </a>
-    <a class="card" href="direction-literary-inline-reveal.html">
-      <div class="swatch sw-lit"><span class="orn">❦</span><span class="bar"></span></div>
-      <div class="body">
-        <p class="num">Direction · Literary</p>
-        <p class="name">A Nicely Bound Book</p>
-        <p class="desc">One clean reading face (Newsreader), running heads, a drop cap. The reveal happens in place — the black bars <b>dissolve</b> to expose the words while the quote stays put.</p>
-        <span class="tag">Canonical · in-place dissolve reveal</span>
-      </div>
-    </a>
-    <a class="card" href="direction-editorial.html">
-      <div class="swatch sw-ed"><span class="bar"></span></div>
-      <div class="body">
-        <p class="num">Alternate · Editorial</p>
-        <p class="name">Daily Puzzle</p>
-        <p class="desc">Crisp white, a serif masthead, one marigold accent. Most shareable and familiar — the games-section feel.</p>
-        <span class="tag">Alternate look</span>
-      </div>
-    </a>
-    <a class="card" href="direction-dossier-refined.html">
-      <div class="swatch sw-do"><span class="bar"></span></div>
-      <div class="body">
-        <p class="num">Alternate · Dossier</p>
-        <p class="name">Declassified Report</p>
-        <p class="desc">Cool stock, Swiss discipline, a single signal-red, the black bar as a sharp matte hero. Concept-forward.</p>
-        <span class="tag">Alternate look</span>
-      </div>
-    </a>
+      <button class="btn reveal-btn" type="submit">Reveal</button>
+    </div>
+  </form>
+
+  <div class="panel" aria-live="polite">
+    <p class="answer" id="answer"></p>
+    <p class="note" id="note"></p>
+    <div class="center"><button class="btn" id="next" type="button" onclick="next()">Next passage →</button></div>
   </div>
+</section>
 
-  <p class="section-label" style="font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:2.5rem 0 1rem;border-top:1px solid var(--line);padding-top:1.2rem;">Round 4 · simple &amp; clean explorations</p>
-  <div class="grid">
-    <a class="card" href="explore-interactions.html">
-      <div class="swatch" style="background:#faf6ec;flex-direction:column;gap:6px;display:flex;align-items:center;justify-content:center;">
-        <span class="bar" style="width:60%;background:#1c1912;"></span>
-        <span class="bar" style="width:60%;background:#1c1912;height:3px;opacity:.8;"></span>
-        <span class="bar" style="width:60%;background:#1c1912;opacity:.25;"></span>
-      </div>
-      <div class="body">
-        <p class="num">Interaction Lab</p>
-        <p class="name">Six Reveal Styles</p>
-        <p class="desc">Dissolve, peel back, fade, drop, slide, strike — plus a stamped-in verdict, a self-drawing underline, and the year rolling back three centuries.</p>
-        <span class="tag">Pick a chip · press Reveal</span>
-      </div>
-    </a>
-    <a class="card" href="explore-folio.html">
-      <div class="swatch" style="background:#fbf8f1;display:grid;place-items:center;">
-        <span style="font-family:var(--serif);color:#6b6353;letter-spacing:.4em;">⁂</span>
-      </div>
-      <div class="body">
-        <p class="num">Exploration · Book</p>
-        <p class="name">Folio</p>
-        <p class="desc">A classic book page and nothing else: one typeface, a roman-numeral folio, small caps, an asterism. The design is the whitespace.</p>
-        <span class="tag">Quietest</span>
-      </div>
-    </a>
-    <a class="card" href="explore-broadsheet.html">
-      <div class="swatch" style="background:#fff;display:grid;place-items:center;">
-        <span class="bar" style="width:60%;background:#000;box-shadow:0 -8px 0 -3px #000, 0 8px 0 -3px #000;"></span>
-      </div>
-      <div class="body">
-        <p class="num">Exploration · Newspaper</p>
-        <p class="name">Broadsheet</p>
-        <p class="desc">Masthead, double rule, dateline, hairlines. Black on white with one press-red. “Price: one guess.”</p>
-        <span class="tag">Crispest</span>
-      </div>
-    </a>
-    <a class="card" href="explore-quarterly.html">
-      <div class="swatch" style="background:#f7f5f0;display:grid;place-items:center;">
-        <span style="font-family:var(--serif);font-size:3rem;font-weight:300;color:#dcd7cc;line-height:1;">“</span>
-      </div>
-      <div class="body">
-        <p class="num">Exploration · Literary journal</p>
-        <p class="name">Quarterly</p>
-        <p class="desc">Flat page, light serif at a large size, a huge hanging quote mark, tiny sans labels, one ochre accent. Air as ornament.</p>
-        <span class="tag">Most modern</span>
-      </div>
-    </a>
+<!-- ============ THE RECKONING ============ -->
+<section class="page screen" id="scr-end">
+  <p class="head">The Reckoning</p>
+  <p class="cap" id="endcap"></p>
+  <p class="bigline" id="endline"></p>
+  <p class="score" id="endscore"></p>
+  <div class="dots" id="dots"></div>
+  <div class="center">
+    <button class="btn" id="share" onclick="share()">Copy &amp; share</button>
+    <button class="btn quiet" onclick="begin()">read again</button>
   </div>
+</section>
 
-  <p class="note" style="border-color:var(--accent);">
-    <b>Reveal happens in place.</b> There's no separate reveal screen — you stay on the quote. On
-    <b>Reveal</b>, the black bars <b>dissolve all at once</b> to expose the innovation, author and date
-    in context; the verdict (✓/✗) appears right in the guess box, and a condensed “it was …” line plus a
-    one-line note follow below. → <a href="direction-literary-inline-reveal.html">Open the mock</a>
-    (press <b>Reveal</b>, then “↺ Redact again” to replay).
-  </p>
+<script src="quotes.js"></script>
+<script>
+/* ---------- state ---------- */
+var i = 0, results = [], guesses = [];
+var $ = function(id){ return document.getElementById(id); };
+var ROMAN = ['i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii'];
 
-  <p class="note">
-    <b>Also settled.</b> The era is never shown before you guess (that surprise is the whole game);
-    redaction can cover the author, date and place too, so the ask is simply <b>“What's the
-    innovation?”</b> The start leans into <b>“everything old was new once,”</b> and the finish
-    <b>leads with your biggest miss</b> — if you ever guessed “AI,” it surfaces the oldest innovation you
-    thought was AI; otherwise the oldest one you got wrong, with your guess.
-  </p>
+/* ---------- guess tracking (Supabase; table is insert-only for this key) ---------- */
+var TRACK = {
+  url: 'https://dvwaqwskqhmocejjfpxo.supabase.co',
+  key: 'sb_publishable_8VG2e0-Mmk84ZsUzVXK_kg_ASen3gtu' /* publishable key — safe to ship */
+};
+var session = newSession();
+function newSession(){
+  try{ return crypto.randomUUID(); }
+  catch(e){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
+    var r = Math.random()*16|0; return (c==='x' ? r : (r&3|8)).toString(16); }); }
+}
+function track(quoteId, guess, correct){
+  if(!TRACK.url || !TRACK.key) return;           /* blank these out to disable tracking */
+  try{
+    fetch(TRACK.url + '/rest/v1/redacted_guesses', {
+      method: 'POST', keepalive: true,
+      headers: { 'Content-Type':'application/json', 'apikey':TRACK.key, 'Authorization':'Bearer '+TRACK.key },
+      body: JSON.stringify({ session_id: session, quote_id: quoteId,
+                             guess: String(guess).slice(0,200), correct: !!correct })
+    }).catch(function(){});                       /* tracking must never break the game */
+  }catch(e){}
+}
 
-  <footer>
-    All quotes are placeholder text. Every direction meets WCAG AA contrast and never signals
-    correct/incorrect by colour alone (a ✓/✗ mark and a word always accompany it). See
-    <a href="README.md">README.md</a> for what each optimizes for and a recommendation.
-  </footer>
-</div>
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.toggle('active', s.id===id); });
+  window.scrollTo(0,0);
+}
+
+/* ---------- helpers ---------- */
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function yearFor(q){ return q.yearLabel || (q.year < 0 ? (-q.year)+' BC' : String(q.year)); }
+
+/* {{!subject}} and {{detail}} become covered terms; era is never shown pre-reveal */
+function quoteHTML(text){
+  return esc(text).replace(/\{\{(!?)([^}]+)\}\}/g, function(_, bang, w){
+    return '<span class="term'+(bang?' subject':'')+'">'
+         + '<span class="word" aria-hidden="true">'+w+'</span>'
+         + '<span class="bar" role="img" aria-label="'+(bang?'the innovation, redacted':'redacted')+'"></span></span>';
+  });
+}
+
+/* loose answer matching: lowercase, drop punctuation and articles */
+function norm(s){
+  return s.toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\b(the|a|an)\b/g,' ')
+          .replace(/\s+/g,' ').trim();
+}
+function isCorrect(guess, q){
+  var g = norm(guess);
+  if(!g) return false;
+  var opts = [q.answer].concat(q.accept||[]).map(norm);
+  return opts.some(function(o){
+    return o===g || (g.length>=4 && (o.indexOf(g)>-1 || g.indexOf(o)>-1));
+  });
+}
+
+/* ---------- flow ---------- */
+function begin(){
+  i = 0; results = []; guesses = [];
+  session = newSession();               /* one session id per playthrough */
+  show('scr-play'); loadPassage();
+}
+
+function loadPassage(){
+  var q = QUOTES[i];
+  var play = $('scr-play');
+  play.classList.remove('revealed','wrong');
+  $('folio').textContent = '· '+ROMAN[i]+' of '+ROMAN[QUOTES.length-1]+' ·';
+  $('quote').innerHTML = quoteHTML(q.text);
+  $('g').value = ''; $('g').readOnly = false;
+  /* no autofocus: focusing here pops the keyboard on phones — the player taps in */
+}
+
+$('form').addEventListener('submit', function(e){
+  e.preventDefault();
+  /* Enter once = reveal; Enter again = next passage */
+  if($('scr-play').classList.contains('revealed')) next(); else reveal();
+});
+
+function reveal(){
+  var q = QUOTES[i];
+  var guess = $('g').value;
+  var ok = isCorrect(guess, q);
+  results.push(ok); guesses.push(guess);
+  track(q.id, guess, ok);
+
+  var mark = $('gmark');
+  mark.textContent = ok ? '✓' : '✗';
+  mark.className = 'gmark ' + (ok ? 'ok' : 'miss');
+  mark.setAttribute('aria-label', ok ? 'correct' : 'incorrect');
+
+  $('answer').innerHTML = ok
+    ? '<span class="ok-word">Just so.</span> — <span class="src">'+esc(q.author)+', <b>'+yearFor(q)+'</b>.</span>'
+    : 'It was <span class="truth">'+esc(q.answer)+'</span> — <span class="src">'+esc(q.author)+', <b>'+yearFor(q)+'</b>.</span>';
+  $('note').textContent = q.note || '';
+
+  $('g').readOnly = true;
+  var play = $('scr-play');
+  play.classList.toggle('wrong', !ok);
+  play.classList.add('revealed');
+}
+
+function next(){
+  i++;
+  if(i < QUOTES.length) loadPassage(); else reckoning();
+}
+
+/* Biggest miss: if they called anything "AI", the oldest such innovation wins;
+   otherwise the oldest innovation they got wrong, with their guess. */
+var AI_RE = /\b(a\.?\s?i\.?|artificial intelligence)\b/i;
+function biggestMiss(){
+  var wrong = [];
+  QUOTES.forEach(function(q,k){ if(!results[k]) wrong.push({q:q, guess:guesses[k]}); });
+  if(!wrong.length) return null;
+  var ai = wrong.filter(function(w){ return AI_RE.test(w.guess); });
+  var pool = ai.length ? ai : wrong;
+  pool.sort(function(a,b){ return a.q.year - b.q.year; });
+  var m = pool[0];
+  return { q:m.q, guess: ai.length ? 'artificial intelligence'
+                                    : (m.guess.trim() || 'a mystery to me') };
+}
+function rank(n){
+  var f = n / QUOTES.length;
+  if(f >= 1)   return 'unfoolable';
+  if(f >= .7)  return 'hard to fool';
+  if(f >= .5)  return 'reasonably suspicious';
+  if(f >= .25) return 'credulous, but charming';
+  return 'gloriously fooled';
+}
+
+function reckoning(){
+  var n = results.filter(Boolean).length;
+  var miss = biggestMiss();
+  if(miss){
+    $('endcap').textContent = 'My finest misjudgement';
+    $('endcap').className = 'cap missy';
+    $('endline').innerHTML = 'I was certain <span class="t">'+esc(miss.q.answer)+'</span> — '
+      + yearFor(miss.q)+' — was <span class="g">'+esc(miss.guess)+'</span>.';
+  }else{
+    $('endcap').textContent = 'Flawless';
+    $('endcap').className = 'cap flawless';
+    $('endline').textContent = 'Nothing got past me — '+QUOTES.length+' of '+QUOTES.length+'.';
+  }
+  $('endscore').textContent = 'I named '+n+' of '+QUOTES.length+' — '+rank(n)+'.';
+  $('dots').innerHTML = results.map(function(r){
+    return '<span class="'+(r?'h':'n')+'">'+(r?'✓':'✗')+'</span>';
+  }).join('');
+  $('dots').setAttribute('aria-label','Results: '+n+' correct of '+QUOTES.length);
+  show('scr-end');
+}
+
+/* ---------- share ---------- */
+function shareText(){
+  var n = results.filter(Boolean).length;
+  var miss = biggestMiss();
+  var lines = ['REDACTED — I named '+n+' of '+QUOTES.length+'.'];
+  if(miss) lines.push('My finest misjudgement: I was certain '+miss.q.answer
+    +' ('+yearFor(miss.q)+') was '+miss.guess+'.');
+  else lines.push('Nothing got past me.');
+  lines.push(results.map(function(r){ return r?'✓':'✗'; }).join(''));
+  return lines.join('\n');
+}
+function share(){
+  var t = shareText(), btn = $('share'), done = function(){
+    btn.textContent = 'Copied.';
+    setTimeout(function(){ btn.innerHTML = 'Copy &amp; share'; }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy(t); done(); });
+  }else{ fallbackCopy(t); done(); }
+}
+function fallbackCopy(t){
+  var ta = document.createElement('textarea');
+  ta.value = t; document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+</script>
 </body>
 </html>

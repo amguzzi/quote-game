@@ -1,166 +1,74 @@
-# REDACTED — Visual Direction Explorations
+# Redacted
 
-A **play-once web game**: read a real reaction to some new innovation, with the
-innovation (and its telltale details) blacked out, and guess *what's the
-innovation?* Then meet the author and the year — usually far older than you'd
-guess. The arc is curiosity → the thrill of being fooled → *"wait, was that AI
-or a 300-year-old book?"*
+A play-once web game. You read real historical reactions to new
+technologies with the innovation blacked out, and guess what they were
+afraid of. Then you meet the author — and the year, which is usually the
+punchline (one of them is Plato).
 
-Static, clickable mockups — look-and-feel only, no real game logic. Open
-`index.html` for the gallery, or any file directly and use the switcher pinned
-at the bottom to walk the screens.
-
-## Round 3 — what changed
-
-- **The era is never shown before a guess.** Any "circa 1600s / 17th century"
-  hints on the quote screen are gone — knowing the age defeats the whole game.
-  Dates appear only in the **reveal**, as the payoff.
-- **Reframed to "What's the innovation?"** The redaction can hide the
-  innovation *and* other identifying details — author, date, place — not just a
-  single tech word.
-- **Start screen** leans into *"everything old was new once"* — every panic
-  about a new innovation has been written before.
-- **Finish screen leads with the biggest miss**, grade second (see logic below).
-- **Flow settled on reveal one-by-one**; the reveal-all-at-the-end variant was
-  retired.
-- **Literary is the front-runner** and is now the fully-realized canonical file
-  (`direction-literary.html`). Editorial and Dossier are kept as alternate looks,
-  updated to the same concept.
-
-## Files
-
-| File | Role |
-|------|------|
-| `index.html` | Gallery / launcher |
-| `direction-literary-inline-reveal.html` | **Literary — a nicely bound book** · front-runner, canonical (in-place dissolve reveal) |
-| `direction-editorial.html` | Alternate — crisp daily puzzle |
-| `direction-dossier-refined.html` | Alternate — declassified report |
-
-## The game (playable build)
-
-**`game.html`** is the real game, kept as simple as possible: one HTML file in
-the **Folio** look (the chosen direction) plus **`quotes.js`**, which holds the
-quotes. The deck is now the **five verified quotes** from the sourced CSV
-(Plato, Baillet, Baudelaire, Licklider, E. B. White); the unverified almanac
-entry was excluded per its own attribution flag. Each entry keeps its `source`
-and `confidence` fields for provenance; the header documents the schema
-(`{{!subject}}` / `{{detail}}` redaction markup, `answer`, `accept` aliases,
-`author`, `year` + optional `yearLabel` like "c. 370 BC", `note`). Add or swap
-quotes and the game adapts — the title copy, ranks and share text all follow
-the deck size.
-
-**Guess tracking:** every reveal fires an insert into the
-`redacted_guesses` table in the owner's Supabase project
-(`session_id` groups a playthrough; `quote_id`, `guess`, `correct`,
-`created_at`). The embedded key is the publishable anon key and the table is
-**insert-only under RLS** — players can record a guess but never read, update
-or delete rows (verified both directions). Tracking is fire-and-forget and can
-never break the game; blank out `TRACK.url`/`TRACK.key` in `game.html` to
-disable it. Read results in the Supabase dashboard, e.g.:
-`select quote_id, guess, correct, count(*) from redacted_guesses group by 1,2,3 order by 1, count(*) desc;`
-
-What it does: title → eight passages one-by-one, guess → **in-place dissolve
-reveal** (quote stays put, verdict ✓/✗ lands in the guess box, era shown only
-on reveal) → the Reckoning, which **leads with your biggest miss** (guessed
-"AI" on any wrong answer → the oldest such innovation; otherwise the oldest
-wrong one, with your guess), then the grade and ✓/✗ row, with copy-to-share.
-Enter reveals; Enter again advances. Answer matching is loose (case, articles
-and punctuation ignored; `accept` aliases). No accounts, no backend, no
-persistence.
-
-## Round 4 — simple & clean explorations
-
-Three stripped-back looks (book / newspaper / literary journal) plus an
-interaction lab, all sharing the rebuilt, browser-stable guess row:
+**Everything is two files:**
 
 | File | What it is |
 |------|------------|
-| `explore-interactions.html` | **Interaction Lab** — six un-redaction styles (dissolve, peel back, fade, drop, slide, strike) selectable via chips, plus three delight moments: the verdict **stamps in** with a little overshoot, the answer's **underline draws itself**, and the **year rolls back** from 2026 to 1698 |
-| `explore-folio.html` | **Folio** — a classic book page: one typeface (EB Garamond), roman-numeral folio, small caps, an asterism, whitespace as the design |
-| `explore-broadsheet.html` | **Broadsheet** — clean newspaper: masthead, double rule, dateline ("Price: one guess"), hairlines, black on white with one press-red |
-| `explore-quarterly.html` | **Quarterly** — modern literary journal: flat page, light large serif, huge hanging quote mark, tiny sans labels, one ochre accent |
+| `index.html` | The whole game — folio look, no build step, no dependencies |
+| `quotes.js`  | The quote deck. Edit this to change the game; no code changes needed |
 
-The guess-row was rebuilt with explicit heights (`.gline`/`.gmark`) after the
-verdict mark kept drifting across browsers — the mark is now a flex sibling
-centered on a fixed-height line and can no longer straddle the underline.
+Serve the two files from anywhere static (Vercel, Netlify, GitHub Pages)
+and it works. Opening `index.html` locally also works, though guess
+tracking may be blocked from `file://`.
 
-## Reveal happens in place
+## How it plays
 
-There is **no separate reveal screen** — you stay on the quote so you can see the
-un-redacted words in context. On **Reveal**:
+Title → passages one at a time. Type a guess, press **Reveal**: the
+redaction bars dissolve in place, a ✓/✗ lands in the guess box, and the
+answer appears with author, year, and a one-line note. Enter reveals;
+Enter again advances. The final Reckoning leads with your *finest
+misjudgement* — if you ever guessed "AI," the oldest thing you said that
+about; otherwise the oldest thing you got wrong — then your score and a
+copy-to-share summary.
 
-- the black bars **dissolve all at once** (fade + slight blur), exposing the
-  innovation, author and date right in the sentence (the answer keeps a quiet
-  green underline);
-- the **verdict (✓/✗) appears inside the guess box**, and a wrong guess is struck
-  through in place — no separate "you guessed" line;
-- a condensed **"It was … — author, year."** line and a one-line context note
-  expand just below.
+Answer matching is loose: case, punctuation and articles are ignored, and
+each quote lists `accept` aliases.
 
-Respects `prefers-reduced-motion` (bars simply disappear). Keeping the quote,
-your guess, and the truth on one screen makes the "wait, *that* old?" beat land
-harder.
+## The quote deck (`quotes.js`)
 
-## Screens & named components
+Each entry:
 
-Cover → **QuoteCard** + **GuessInput** → **RevealCard** → **ScoreSummary** +
-**ShareCard**, built from the same six named components (`QuoteCard`,
-`RedactionBar`, `GuessInput`, `RevealCard`, `ScoreSummary`, `ShareCard`) so a
-chosen direction ports over cleanly. The **RedactionBar** is the signature
-element and now appears in the body *and* the citation line (author/date struck
-out) to reinforce that identifying details are hidden.
+```js
+{
+  id: "writing-plato",          // stable key, used for guess tracking
+  text: "… their trust in {{!writing}}, produced by external characters …",
+  answer: "writing",            // shown on reveal
+  accept: ["the alphabet"],     // extra answers counted correct
+  author: "Plato",              // shown only on reveal
+  year: -370,                   // number; negative = BC (sorts the "oldest miss")
+  yearLabel: "c. 370 BC",       // optional display override
+  note: "…",                    // one-line blurb shown after the reveal
+  source: "…", confidence: "…"  // provenance, not shown in game
+}
+```
 
-## The "biggest miss" that leads the finish
+`{{!…}}` marks the innovation (underlined on reveal); `{{…}}` marks other
+identifying details to redact. Nothing outside the reveal should hint at
+the era. Array order is play order. All five current quotes are verified
+against the sourced deck; an unverified entry was excluded.
 
-The results screen opens with the single most entertaining wrong answer, chosen
-like this (documented in a comment on each file's results screen):
+## Guess tracking
 
-1. **If the player named "AI" / "artificial intelligence" on any wrong answer**,
-   surface the **oldest** actual innovation among those:
-   *"I was certain [oldest such innovation], [year], was artificial intelligence."*
-2. **Otherwise**, surface the **oldest** innovation they got wrong, with their
-   guess: *"I was certain [oldest wrong innovation], [year], was [their guess]."*
+Every reveal fires an insert into the `redacted_guesses` table of the
+owner's Supabase project (`session_id` per playthrough, `quote_id`,
+`guess`, `correct`). The embedded key is the publishable anon key and the
+table is insert-only under RLS — players can write a guess, never read
+one. Tracking is fire-and-forget and can never break the game; blank out
+`TRACK.url`/`TRACK.key` in `index.html` to disable it.
 
-The grade (e.g. *4 of 8 · reasonably suspicious*) and the ✓/✗ marks follow
-underneath. The mockups show case 1 — the funniest and most on-theme.
-
-## Accessibility
-
-- Body/label text meets **WCAG AA** (most primary text AAA), checked against each direction's own background.
-- **Never colour alone:** correct/incorrect always carries a **✓ / ✗ glyph + a word** ("Not quite" / "Correct" / "Incorrect identification"); struck-through guess vs. underlined answer differ by shape, not just hue. Share/marks rows are labelled for screen readers.
-- Redaction bars carry `role="img"` + an `aria-label` ("the innovation, redacted", "author and date, redacted", …).
-- `prefers-reduced-motion` disables transitions.
-- All quotes are **placeholder text**.
+```sql
+-- read results in Supabase:
+select quote_id, guess, correct, count(*)
+from redacted_guesses group by 1,2,3 order by 1, count(*) desc;
+```
 
 ---
 
-## What each direction optimizes for — and where it struggles
-
-### Literary — A Nicely Bound Book  ★ front-runner
-**Optimizes for:** the witty, literary, keepsake tone the brief asks for. One
-clean reading face, generous margins, running heads and folios make it feel like
-a beautifully typeset book; hiding the citation behind the bar and revealing
-"1698" on the next leaf lands the "wait, *that* old?" beat perfectly. Ages well;
-feels like an object, not a meme.
-**Struggles with:** it's the quietest — the wit lives in the copy, since the
-chrome is restrained. Lower built-in urgency than a daily-puzzle frame, and fine
-typography needs care to stay crisp responsively.
-
-### Editorial — Daily Puzzle (alternate)
-**Optimizes for:** shareability and trust — reads instantly as a reputable daily
-puzzle. Cleanest ShareCard, best on small screens, cheapest to build.
-**Struggles with:** familiarity is its ceiling; can feel derivative and carries
-the least literary soul. Risks reading "clinical."
-
-### Dossier, refined — Declassified Report (alternate)
-**Optimizes for:** keeping the redaction concept front-and-centre without kitsch.
-Cool stock + Swiss type + one signal-red make the bar feel deliberate; the
-"unsealed record" framing gives the reveal a satisfying click.
-**Struggles with:** seriousness can tip into cold — least playful of the three,
-leans on copy for warmth.
-
-## Recommendation
-
-Ship **Literary** with **reveal one-by-one** and the **miss-first finish**. Borrow
-**Editorial's ShareCard clarity** if the share loop needs more punch. Keep
-**Dossier** as the sharper, more concept-driven alternative.
+The design exploration that led here (four visual directions, a reveal-
+pattern lab, two flow studies) lives in this repo's git history, before
+the "Just the game" commit.
