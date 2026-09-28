@@ -51,7 +51,7 @@ blockquote{font-size:var(--t-xl); line-height:1.6; margin-top:1.8rem;}
 @media (prefers-reduced-motion:reduce){.play.revealed .term .bar{animation:none; opacity:0;}}
 
 /* ---------- guess row (fixed-height, browser-stable) ---------- */
-.question{text-align:center; font-style:italic; font-size:var(--t-lg); margin:2rem 0 .8rem;}
+.question{text-align:left; font-style:italic; font-size:var(--t-lg); margin:2rem 0 .8rem;}
 .row{display:flex; align-items:center; gap:1.2rem;}
 .gline{flex:1; min-width:0; display:flex; align-items:center; gap:.45rem; height:2.5rem; border-bottom:1.5px solid var(--ink);}
 .gline:focus-within{border-bottom-width:2px;}
@@ -69,8 +69,10 @@ blockquote{font-size:var(--t-xl); line-height:1.6; margin-top:1.8rem;}
   text-decoration-color:var(--miss); text-decoration-thickness:1.5px;}
 
 /* ---------- in-place reveal panel ---------- */
-.panel{max-height:0; opacity:0; overflow:hidden; transition:max-height .5s ease .75s, opacity .5s ease .75s;}
-.play.revealed .panel{max-height:340px; opacity:1;}
+/* the open transition is delayed (until the bars dissolve); closing is instant,
+   so the previous answer never lingers over the next passage */
+.panel{max-height:0; opacity:0; overflow:hidden;}
+.play.revealed .panel{max-height:340px; opacity:1; transition:max-height .5s ease .75s, opacity .5s ease .75s;}
 .answer{font-size:var(--t-lg); margin-top:1.1rem;}
 .answer .truth{font-weight:500; border-bottom:1.5px solid var(--correct);}
 .answer .ok-word{color:var(--correct);}
@@ -226,6 +228,7 @@ function loadPassage(){
   $('folio').textContent = '· '+ROMAN[i]+' of '+ROMAN[QUOTES.length-1]+' ·';
   $('quote').innerHTML = quoteHTML(q.text);
   $('g').value = ''; $('g').readOnly = false;
+  $('answer').innerHTML = ''; $('note').textContent = '';   /* never carry the old answer forward */
   /* no autofocus: focusing here pops the keyboard on phones — the player taps in */
 }
 
@@ -248,7 +251,7 @@ function reveal(){
   mark.setAttribute('aria-label', ok ? 'correct' : 'incorrect');
 
   $('answer').innerHTML = ok
-    ? '<span class="ok-word">Just so.</span> — <span class="src">'+esc(q.author)+', <b>'+yearFor(q)+'</b>.</span>'
+    ? '<span class="ok-word">Right,</span> <span class="truth">'+esc(q.answer)+'</span> — <span class="src">'+esc(q.author)+', <b>'+yearFor(q)+'</b>.</span>'
     : 'It was <span class="truth">'+esc(q.answer)+'</span> — <span class="src">'+esc(q.author)+', <b>'+yearFor(q)+'</b>.</span>';
   $('note').textContent = q.note || '';
 
