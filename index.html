@@ -57,7 +57,6 @@ blockquote{font-size:var(--t-xl); line-height:1.6; margin-top:1.8rem;}
 .gline:focus-within{border-bottom-width:2px;}
 .gline input{flex:1; min-width:0; height:100%; font-size:var(--t-lg); font-style:italic; color:var(--ink);
   background:transparent; border:none; outline:none; padding:0 .05em;}
-.gline input::placeholder{color:var(--muted); opacity:.6;}
 .gmark{flex:none; width:1.5rem; height:1.5rem; border-radius:100px; display:grid; place-items:center;
   border:1.5px solid; font-size:.95rem; line-height:1; font-style:normal; visibility:hidden;}
 .gmark.miss{color:var(--miss); border-color:var(--miss);}
@@ -124,8 +123,7 @@ blockquote{font-size:var(--t-xl); line-height:1.6; margin-top:1.8rem;}
   <form id="form">
     <div class="row">
       <div class="gline">
-        <input id="g" type="text" autocomplete="off" autocapitalize="off"
-               placeholder="an innovation…" aria-labelledby="ask">
+        <input id="g" type="text" autocomplete="off" autocapitalize="off" aria-labelledby="ask">
         <span class="gmark" id="gmark" role="img"></span>
       </div>
       <button class="btn reveal-btn" type="submit">Reveal</button>
