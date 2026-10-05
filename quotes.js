@@ -1,82 +1,12 @@
 /* ============================================================
-   REDACTED — quote library
-   Sourced from the verified quote deck (39222546-redacted-tech-
-   quote-deck.csv). The unverified almanac entry was excluded per
-   its own attribution flag.
-
-   Schema, per entry:
-     id        stable key, used for guess tracking
-     text      the passage. Wrap redacted spans in {{...}};
-               the span naming the innovation gets a ! —
-               {{!like this}} — and is underlined on reveal.
-               (No spans is fine: Baudelaire never names it.)
-     answer    the innovation, as shown on reveal
-     accept    extra answers counted as correct (loose matching)
-     author    shown only on reveal
-     year      a number; negative = BC (used for sorting)
-     yearLabel optional display override ("c. 370 BC")
-     note      one-line context blurb shown after the reveal
-     source    provenance (not shown in game)
-     confidence  attribution status from the deck (not shown)
-
-   The array order is the play order.
+   REDACTED — quote deck (encoded)
+   The deck is XOR+base64 encoded so answers don't appear in
+   view-source. This deters casual cheating only — it is NOT
+   encryption. To edit the quotes, see "Editing the deck" in
+   README.md (decode, edit the JSON, re-encode).
    ============================================================ */
-const QUOTES = [
-  {
-    id: "books-baillet",
-    text: "We have reason to fear that the multitude of {{!books}} which grows every day in a prodigious fashion will make the following centuries fall into a state as barbarous as that of the centuries that followed the fall of the Roman Empire…",
-    answer: "the printed book",
-    accept: ["books", "the book", "printed books", "the printing press", "print"],
-    author: "Adrien Baillet",
-    year: 1685,
-    note: "A 17th-century scholar predicting we'd slip into a Dark Age if information was too widely spread amongst the people.",
-    source: "Jugemens des sçavans (Paris, 1685); English translation by Ann Blair",
-    confidence: "Verified (English wording is Ann Blair's translation of the French)"
-  },
-  {
-    id: "television-white",
-    text: "I believe {{!television}} is going to be the test of the modern world… We shall stand or fall by {{!television}} — of that I am quite sure.",
-    answer: "television",
-    accept: ["television", "tv", "the television"],
-    author: "E. B. White",
-    year: 1938,
-    note: "The creator of Charlotte's Web & Stuart Little was worried about screen time before millennial parents were.",
-    source: "“Removal” (July 1938), collected in One Man's Meat (1942); trimmed with an ellipsis",
-    confidence: "Verified"
-  },
-  {
-    id: "photography-baudelaire",
-    text: "…this industry, by invading the territories of art, has become art's most mortal enemy.",
-    answer: "photography",
-    accept: ["photography", "the camera", "the daguerreotype", "photographs", "photos"],
-    author: "Charles Baudelaire",
-    year: 1859,
-    note: "A poet concerned that digitally produced art degraded what painters produced.",
-    source: "“Le Public Moderne et la Photographie,” Revue Française (Salon de 1859); Mayne translation",
-    confidence: "Verified (no tech named in the sentence — inherently ambiguous)"
-  },
-  {
-    id: "interactive-computing-licklider",
-    text: "…because {{!interactive computers}} can give us our first look at unfettered thought. It can allow a decision maker to do almost nothing but decision making, instead of processing data to get into position to make the decision.",
-    answer: "interactive computing",
-    accept: ["computers", "the computer", "interactive computing", "time-sharing", "personal computing", "computing"],
-    author: "J.C.R. Licklider",
-    year: 1961,
-    yearLabel: "1961",
-    note: "A computing pioneer dreamed that machines would free us to do nothing but think.",
-    source: "Remarks in Martin Greenberger (ed.), Management and the Computer of the Future (MIT Press & Wiley, 1962), from a 1961 MIT symposium. “[interactive computers]” is an editorial bracket for Licklider's original pronoun.",
-    confidence: "Verified with correction — not “Man-Computer Symbiosis” / 1960"
-  },
-  {
-    id: "writing-plato",
-    text: "For this invention will produce forgetfulness in the minds of those who learn to use it, because they will not practice their memory. Their trust in {{!writing}}, produced by external characters which are no part of themselves, will discourage the use of their own memory within them.",
-    answer: "writing",
-    accept: ["writing", "the alphabet", "written language", "letters", "script", "the written word"],
-    author: "Plato",
-    year: -370,
-    yearLabel: "c. 370 BC",
-    note: "The original “this new technology will rot your brain” take — aimed at the written word itself.",
-    source: "Phaedrus, 274e–275b (Fowler / Loeb translation); Socrates relaying the myth of Thamus & Theuth",
-    confidence: "Verified"
-  }
-];
+const QUOTES = (function(){
+  var b = atob("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"), k = "redacted", s = "";
+  for (var i = 0; i < b.length; i++) s += String.fromCharCode(b.charCodeAt(i) ^ k.charCodeAt(i % k.length));
+  return JSON.parse(decodeURIComponent(escape(s)));
+})();
