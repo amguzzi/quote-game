@@ -283,8 +283,7 @@ function rank(n){
   if(f >= 1)   return 'unfoolable';
   if(f >= .7)  return 'hard to fool';
   if(f >= .5)  return 'reasonably suspicious';
-  if(f >= .25) return 'credulous, but charming';
-  return 'gloriously fooled';
+  return 'Foiled & fooled';
 }
 
 function reckoning(){
@@ -312,7 +311,7 @@ function reckoning(){
 function shareText(){
   var n = results.filter(Boolean).length;
   var miss = biggestMiss();
-  var lines = ['REDACTED — I named '+n+' of '+QUOTES.length+'.'];
+  var lines = ['REDACTED — I named '+n+' of '+QUOTES.length+' innovations that changed the world.'];
   if(miss) lines.push('My finest misjudgement: I was certain '+miss.q.answer
     +' ('+yearFor(miss.q)+') was '+miss.guess+'.');
   else lines.push('Nothing got past me.');

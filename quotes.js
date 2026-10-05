@@ -29,7 +29,7 @@ const QUOTES = [
     accept: ["books", "the book", "printed books", "the printing press", "print"],
     author: "Adrien Baillet",
     year: 1685,
-    note: "A 17th-century scholar forecasting a new Dark Age from information overload — the information being too many books.",
+    note: "A 17th-century scholar predicting we'd slip into a Dark Age if information was too widely spread amongst the people.",
     source: "Jugemens des sçavans (Paris, 1685); English translation by Ann Blair",
     confidence: "Verified (English wording is Ann Blair's translation of the French)"
   },
@@ -40,7 +40,7 @@ const QUOTES = [
     accept: ["television", "tv", "the television"],
     author: "E. B. White",
     year: 1938,
-    note: "The Charlotte's Web author, ambivalent prophet, betting civilization itself on the little glowing box.",
+    note: "The creator of Charlotte's Web & Stuart Little was worried about screen time before millennial parents were.",
     source: "“Removal” (July 1938), collected in One Man's Meat (1942); trimmed with an ellipsis",
     confidence: "Verified"
   },
@@ -51,7 +51,7 @@ const QUOTES = [
     accept: ["photography", "the camera", "the daguerreotype", "photographs", "photos"],
     author: "Charles Baudelaire",
     year: 1859,
-    note: "France's most quotable poet declaring open war on the camera for muscling in on painting's turf.",
+    note: "A poet concerned that digitally produced art degraded what painters produced.",
     source: "“Le Public Moderne et la Photographie,” Revue Française (Salon de 1859); Mayne translation",
     confidence: "Verified (no tech named in the sentence — inherently ambiguous)"
   },
@@ -63,7 +63,7 @@ const QUOTES = [
     author: "J.C.R. Licklider",
     year: 1961,
     yearLabel: "1961",
-    note: "A computing pioneer dreaming machines would free us to do nothing but think — before the microchip existed.",
+    note: "A computing pioneer dreamed that machines would free us to do nothing but think.",
     source: "Remarks in Martin Greenberger (ed.), Management and the Computer of the Future (MIT Press & Wiley, 1962), from a 1961 MIT symposium. “[interactive computers]” is an editorial bracket for Licklider's original pronoun.",
     confidence: "Verified with correction — not “Man-Computer Symbiosis” / 1960"
   },
@@ -75,7 +75,7 @@ const QUOTES = [
     author: "Plato",
     year: -370,
     yearLabel: "c. 370 BC",
-    note: "The original “this new technology will rot your brain” take — aimed at the written word ~2,400 years before the group chat.",
+    note: "The original “this new technology will rot your brain” take — aimed at the written word itself.",
     source: "Phaedrus, 274e–275b (Fowler / Loeb translation); Socrates relaying the myth of Thamus & Theuth",
     confidence: "Verified"
   }
