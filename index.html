@@ -45,6 +45,7 @@ body{font-family:var(--serif); color:var(--ink); background:var(--paper); line-h
 .btn{display:inline-block; font-family:var(--serif); font-size:var(--t-md); background:var(--ink); color:var(--page);
   border:1px solid var(--ink); border-radius:2px; padding:.55em 1.6em; cursor:pointer; white-space:nowrap;}
 .btn:hover{opacity:.9;}
+.btn:disabled{opacity:.35; cursor:not-allowed;}
 .btn.quiet{background:transparent; color:var(--muted); border:none; font-style:italic; font-size:var(--t-sm); text-decoration:underline;}
 
 /* ---------- title ---------- */
@@ -138,7 +139,7 @@ blockquote{font-size:var(--t-xl); line-height:1.6; margin-top:1.8rem;}
         <input id="g" type="text" autocomplete="off" autocapitalize="off" aria-labelledby="ask">
         <span class="gmark" id="gmark" role="img"></span>
       </div>
-      <button class="btn reveal-btn" type="submit">Reveal</button>
+      <button class="btn reveal-btn" id="reveal" type="submit" disabled>Reveal</button>
     </div>
   </form>
 
@@ -238,14 +239,20 @@ function loadPassage(){
   $('folio').textContent = '· '+ROMAN[i]+' of '+ROMAN[QUOTES.length-1]+' ·';
   $('quote').innerHTML = quoteHTML(q.text);
   $('g').value = ''; $('g').readOnly = false;
+  $('reveal').disabled = true;                              /* no blank guesses */
   $('answer').innerHTML = ''; $('note').textContent = '';   /* never carry the old answer forward */
   /* no autofocus: focusing here pops the keyboard on phones — the player taps in */
 }
 
+function hasGuess(){ return $('g').value.trim() !== ''; }
+$('g').addEventListener('input', function(){ $('reveal').disabled = !hasGuess(); });
+
 $('form').addEventListener('submit', function(e){
   e.preventDefault();
   /* Enter once = reveal; Enter again = next passage */
-  if($('scr-play').classList.contains('revealed')) next(); else reveal();
+  if($('scr-play').classList.contains('revealed')) next();
+  else if(hasGuess()) reveal();
+  else $('g').focus();
 });
 
 function reveal(){
