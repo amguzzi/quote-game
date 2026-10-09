@@ -20,7 +20,6 @@ body{width:1080px;height:1080px;background:var(--paper);font-family:var(--serif)
 .cloud{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:0 26px;max-width:820px}
 .w{font-size:38px;color:var(--muted)}
 .w.b{font-weight:600;color:var(--ink)}
-.w sup{font-size:.5em;font-weight:400;color:var(--muted);margin-left:2px}
 .foot{margin-top:auto;font-size:22px;color:var(--muted);letter-spacing:.04em}
 </style></head><body>
 <div class="page">
@@ -40,7 +39,7 @@ var W=[['reading',1],['cars',2],['steam',1],['democracy',1],['recording',1],['co
  ['travel',1],['calculators',1],['manufacturing',1],['photography',2],['print',1]];
 document.getElementById('cloud').innerHTML=W.map(function(x){
   var n=x[1], sz=34+(n>1?8+n*4:0);
-  return '<span class="w'+(n>1?' b':'')+'" style="font-size:'+sz+'px">'+x[0]+(n>1?'<sup>×'+n+'</sup>':'')+'</span>';
+  return '<span class="w'+(n>1?' b':'')+'" style="font-size:'+sz+'px">'+x[0]+'</span>';
 }).join('');
 </script>
 </body></html>
